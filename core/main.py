@@ -1,4 +1,6 @@
+import os
 import customtkinter as tk
+import zipfile
 from functools import partial
 
 from core.settings import *
@@ -19,6 +21,8 @@ class ModEditor(tk.CTk):
         self.newModText = "New mod"
         self.addItemText = "Add item"
 
+        self.newModTabText = "Mod params"
+
         self.tabs = {}
         self.buttons = {}
         self.labels = {}
@@ -29,28 +33,27 @@ class ModEditor(tk.CTk):
 
         # menu new mod
         self.addTab(self.newModText)
-        """ self.tabs["newMod"] = self.mainTabMenu.add(self.newModText) """
+        self.getTab(self.newModText).grid_columnconfigure(0, weight=1)
 
         self.addButton(self.newModText, "newMod", "Create new mod", self.callbackCreateNewMod, 0, 0)
         self.addButton(self.newModText, "openMod", "Open mod", self.callbackOpenMod, 1, 0)
-        """ newModButton = tk.CTkButton(self.tabs, text="Create new mod", command=self.callbackCreateNewMod)
-        newModButton.grid(row=0, column=0, padx=10, pady=10)
-        newModButton = tk.CTkButton(self.mainNewMod, text="Open mod", command=self.callbackOpenMod)
-        newModButton.grid(row=1, column=0, padx=10, pady=10) """
 
         # menu postsetup
         self.mainTabMenu.set(self.newModText)
 
     def callbackCreateNewMod(self):
-        self.addTab("New mod params")
-        self.selectTab("New mod params") # this is borderline stupid
-        self.getTab("New mod params").grid_columnconfigure(0, weight=1)
-        self.getTab("New mod params").grid_rowconfigure(0, weight=1)
-        self.addLabel("New mod params", "infoLabel", "New mod parameters", 0, 0)
+        self.addTab(self.newModTabText)
+        self.selectTab(self.newModTabText) # this is borderline stupid
+        self.getTab(self.newModTabText).grid_columnconfigure(0, weight=1)
+        self.addLabel(self.newModTabText, "infoLabel", "New mod parameters", 0, 0)
+
+        self.addButton(self.newModTabText, "saveMod", "Export mod", partial(self.saveNcaOutput, "new_mod", None))
         print("created new mod")
 
     def callbackOpenMod(self):
-        print("opened mod file picked")
+        filename = tk.filedialog.askopenfilename(filetypes=[("Nebula compressed archive", ".nca")], title="Select mod .nca file", initialdir=os.getcwd() + "/" + OUTPUT_FOLDER_PATH)
+        print("picked mod file:", filename)
+        self.openNcaProject(filename)
 
     def addTab(self, tabName:str):
         try:
@@ -77,6 +80,17 @@ class ModEditor(tk.CTk):
 
     def getTab(self, tabName:str):
         return self.tabs[tabName]
+    
+    def saveNcaOutput(self, fileName:str, files:list[str]):
+        with zipfile.ZipFile(OUTPUT_FOLDER_PATH + fileName + ARCHIVE_EXTENSION, "w", zipfile.ZIP_DEFLATED) as zip:
+            zip.write(TEMP_FOLDER_PATH + "test.txt")
+
+    def openNcaProject(self, fileName:str):
+        with zipfile.ZipFile(fileName, "r", zipfile.ZIP_DEFLATED) as zip:
+            zip.extractall(TEMP_FOLDER_PATH)
+
+            for file in zip.namelist():
+                print(file)
 
 def run():
     print("starting mod editor")
