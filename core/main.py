@@ -4,6 +4,10 @@ import zipfile
 from functools import partial
 
 from core.settings import *
+from core.json.json_loader import JsonLoader
+from core.tabview.mainTabView import MainTabview
+from core.tabs.mainTab import MainTab
+from core.tabs.newModTab import NewModTab
 
 class ModEditor(tk.CTk):
     def __init__(self, fg_color = None, **kwargs):
@@ -18,36 +22,24 @@ class ModEditor(tk.CTk):
         self.grid_rowconfigure(0, weight=1)
 
         # initial values
-        self.newModText = "New mod"
-        self.addItemText = "Add item"
-
-        self.newModTabText = "Mod params"
-
         self.tabs = {}
         self.buttons = {}
         self.labels = {}
 
         # menu bar
-        self.mainTabMenu = tk.CTkTabview(self)
+        self.mainTabMenu = MainTabview(master=self)
         self.mainTabMenu.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
         # menu new mod
-        self.addTab(self.newModText)
-        self.getTab(self.newModText).grid_columnconfigure(0, weight=1)
-
-        self.addButton(self.newModText, "newMod", "Create new mod", self.callbackCreateNewMod, 0, 0)
-        self.addButton(self.newModText, "openMod", "Open mod", self.callbackOpenMod, 1, 0)
+        self.addTab(WINDOW_NAMES['main'], MainTab)
 
         # menu postsetup
-        self.mainTabMenu.set(self.newModText)
+        self.selectTab(WINDOW_NAMES['main'])
 
     def callbackCreateNewMod(self):
-        self.addTab(self.newModTabText)
-        self.selectTab(self.newModTabText) # this is borderline stupid
-        self.getTab(self.newModTabText).grid_columnconfigure(0, weight=1)
-        self.addLabel(self.newModTabText, "infoLabel", "New mod parameters", 0, 0)
+        self.addTab(WINDOW_NAMES['newMod'], NewModTab)
+        self.selectTab(WINDOW_NAMES['newMod']) # this is borderline stupid
 
-        self.addButton(self.newModTabText, "saveMod", "Export mod", partial(self.saveNcaOutput, "new_mod", None))
         print("created new mod")
 
     def callbackOpenMod(self):
@@ -55,10 +47,10 @@ class ModEditor(tk.CTk):
         print("picked mod file:", filename)
         self.openNcaProject(filename)
 
-    def addTab(self, tabName:str):
-        try:
-            self.tabs[tabName] = self.mainTabMenu.add(tabName)
-        except: print("tab already added")
+    def addTab(self, tabName:str, frameClass):
+        #try:
+        self.tabs[tabName] = self.mainTabMenu.add_tab(tabName, frameClass(self.mainTabMenu))
+        #except: print("tab already added")
 
     def addButton(self, targetTab:str, buttonName:str, text:str, callbackFunction, gridRow:int=0, gridCol:int=0):
         self.buttons[buttonName] = tk.CTkButton(
@@ -81,9 +73,18 @@ class ModEditor(tk.CTk):
     def getTab(self, tabName:str):
         return self.tabs[tabName]
     
-    def saveNcaOutput(self, fileName:str, files:list[str]):
-        with zipfile.ZipFile(OUTPUT_FOLDER_PATH + fileName + ARCHIVE_EXTENSION, "w", zipfile.ZIP_DEFLATED) as zip:
-            zip.write(TEMP_FOLDER_PATH + "test.txt")
+
+    ## SAVING
+
+    def saveModInfoJson(self, modId:str, data:dict):
+        JsonLoader.write_to_file(TEMP_FOLDER_PATH + data['mod_id'] + "/" + MOD_INFO_NAMES['modInfo'] + JSON_EXTENSION, data)
+    
+
+    def saveNcaOutput(self, modId:str):
+        with zipfile.ZipFile(OUTPUT_FOLDER_PATH + modId + ARCHIVE_EXTENSION, "w", zipfile.ZIP_DEFLATED) as zip:
+            folderPath = TEMP_FOLDER_PATH + modId + "/"
+            zip.write(folderPath + MOD_INFO_NAMES["modInfo"] + JSON_EXTENSION)
+
 
     def openNcaProject(self, fileName:str):
         with zipfile.ZipFile(fileName, "r", zipfile.ZIP_DEFLATED) as zip:
@@ -91,6 +92,7 @@ class ModEditor(tk.CTk):
 
             for file in zip.namelist():
                 print(file)
+
 
 def run():
     print("starting mod editor")
