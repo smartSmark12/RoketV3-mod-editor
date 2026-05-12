@@ -111,6 +111,7 @@ class ModEditor(tk.CTk):
             for file in zip.namelist():
                 print(file)
 
+        # load the mod into the editor
         self.loadTempProject()
 
 

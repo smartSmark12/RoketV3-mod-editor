@@ -3,12 +3,15 @@ from functools import partial
 
 from core.settings import *
 from core.tabs.customTabBase import CustomTabBase
+from core.frames.featuresFrame import FeaturesFrame
+from core.frames.featureAddFrame import FeatureAddFrame
 
 class NewModTab(CustomTabBase):
     def __init__(self, master, meta=None, **kwargs):
         super().__init__(master, meta, **kwargs)
 
         self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=2)
 
         print(meta)
 
@@ -23,7 +26,7 @@ class NewModTab(CustomTabBase):
 
         # label
         self.mainLabel = tk.CTkLabel(self, text="New mod parameters")
-        self.mainLabel.grid(row=0, column=0, padx=10, pady=10)
+        self.mainLabel.grid(row=0, column=0, padx=10, pady=10, columnspan=2)
 
         # mod meta settings
         self.metaFrame = tk.CTkFrame(self)
@@ -75,13 +78,33 @@ class NewModTab(CustomTabBase):
         self.saveMetaButton.grid(row=99, column=1, padx=10, pady=10)
 
 
+
+        # mod features
+        self.featuresFrame = FeaturesFrame(self)
+        self.featuresFrame.grid(row=1, column=1, padx=10, pady=10, sticky="nsew")
+
+
+        # add feature
+        self.featureAddFrame = FeatureAddFrame(self)
+        self.featureAddFrame.grid(row=2, column=1, padx=10, pady=10, sticky="nsew")
+
+
+
+
         # mod export
-        self.exportButton = tk.CTkButton(self, text="Export mod", command=self.exportMod)
-        self.exportButton.grid(row=98, column=0, padx=10, pady=10)
+        self.exportFrame = tk.CTkFrame(self)
+        self.exportFrame.grid(row=2, column=0, padx=10, pady=10)
 
 
-        self.closeButton = tk.CTkButton(self, text="Close", command=self.close)
-        self.closeButton.grid(row=99, column=0, padx=10, pady=10)
+        self.exportButton = tk.CTkButton(self.exportFrame, text="Export mod", command=self.exportMod)
+        self.exportButton.grid(row=0, column=0, padx=10, pady=10)
+
+
+        self.closeButton = tk.CTkButton(self.exportFrame, text="Close", command=self.close)
+        self.closeButton.grid(row=1, column=0, padx=10, pady=10)
+
+
+    """ def saveOrOverwriteFeature() """
 
 
     def saveMeta(self):

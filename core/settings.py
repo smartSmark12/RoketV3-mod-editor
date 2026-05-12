@@ -19,6 +19,18 @@ DEFAULT_SETTINGS = {
     "version":"0.0.1"
 }
 
+POSSIBLE_FEATURE_TYPES = {
+    "module_types":"Module type",
+    "modules":"Module",
+    "spawnables":"Spawnable",
+    "ships":"Ship",
+    "environment_objects":"Environment object",
+    "environment":"Environment",
+    "careers":"Career",
+    "levels":"Level",
+    "localization":"Localization"
+}
+
 WINDOW_SIZE = (1600, 900)
 
 OUTPUT_FOLDER_PATH = "output/"
