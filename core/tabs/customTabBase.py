@@ -2,7 +2,7 @@ import customtkinter as tk
 
 class CustomTabBase(tk.CTkFrame):
 
-    def __init__(self, master, **kwargs):
+    def __init__(self, master, meta=None, **kwargs):
         super().__init__(master, **kwargs)
 
         self.buttons = {}

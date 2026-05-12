@@ -4,8 +4,8 @@ from core.tabs.customTabBase import CustomTabBase
 from core.settings import *
 
 class MainTab(CustomTabBase):
-    def __init__(self, master, **kwargs):
-        super().__init__(master, **kwargs)
+    def __init__(self, master, meta=None, **kwargs):
+        super().__init__(master, meta, **kwargs)
 
         self.buttons = {}
 

@@ -12,6 +12,13 @@ TEXTS = {
     "newModTab":"Mod params"
 }
 
+DEFAULT_SETTINGS = {
+    "author":None, # unused
+    "id":"newMod",
+    "name":"New mod",
+    "version":"0.0.1"
+}
+
 WINDOW_SIZE = (1600, 900)
 
 OUTPUT_FOLDER_PATH = "output/"
